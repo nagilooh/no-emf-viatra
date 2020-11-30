@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<friends:People
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:friends="http://www.inf.mit.bme.hu/friends"
+    xsi:schemaLocation="http://www.inf.mit.bme.hu/friends ../hu.bme.mit.inf.friends/model/friends.ecore">
+  <person friend="//@person.1 //@person.0"
+      name="James"/>
+  <person friend="//@person.0 //@person.2"
+      name="Robert"/>
+  <person name="Michael"/>
+</friends:People>

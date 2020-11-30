@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><plugin>
+  <extension id="hu.bme.mit.inf.friends.queries.Queries" point="org.eclipse.viatra.query.runtime.queryspecification">
+    <group group="org.eclipse.viatra.query.runtime.extensibility.SingletonExtensionFactory:hu.bme.mit.inf.friends.queries.Queries" id="hu.bme.mit.inf.friends.queries.Queries">
+      <query-specification fqn="hu.bme.mit.inf.friends.queries.friend"/>
+    </group>
+  </extension>
+  <extension id="queryrunner" point="org.eclipse.core.runtime.applications">
+    <application cardinality="singleton-global" thread="main" visible="true">
+      <run class="hu.bme.mit.inf.friends.queries.runner.QueryRunner"/>
+    </application>
+  </extension>
+</plugin>

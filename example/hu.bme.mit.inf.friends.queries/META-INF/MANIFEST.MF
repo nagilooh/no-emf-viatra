@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: hu.bme.mit.inf.friends.queries
+Bundle-SymbolicName: hu.bme.mit.inf.friends.queries;singleton:=true
+Bundle-Version: 0.0.1.qualifier
+Export-Package: hu.bme.mit.inf.friends.queries
+Require-Bundle: org.eclipse.emf.ecore,
+ org.eclipse.viatra.query.runtime,
+ org.eclipse.viatra.query.runtime.rete,
+ org.eclipse.viatra.query.runtime.localsearch,
+ org.eclipse.xtext.xbase.lib,
+ hu.bme.mit.inf.friends;bundle-version="0.1.0",
+ org.eclipse.equinox.app
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: org.apache.log4j
