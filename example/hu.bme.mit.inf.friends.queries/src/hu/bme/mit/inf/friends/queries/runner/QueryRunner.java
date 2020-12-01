@@ -9,6 +9,7 @@ import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.viatra.query.runtime.api.ViatraQueryEngine;
 import org.eclipse.viatra.query.runtime.api.scope.QueryScope;
+import org.eclipse.viatra.query.runtime.emf.EMFScope;
 import org.eclipse.viatra.query.runtime.matchers.scopes.SimpleLocalStorageBackend;
 import org.eclipse.viatra.query.runtime.matchers.scopes.tables.ITableWriterBinary;
 import org.eclipse.viatra.query.runtime.matchers.scopes.tables.ITableWriterUnary;
@@ -16,13 +17,10 @@ import org.eclipse.viatra.query.runtime.matchers.util.Direction;
 import org.eclipse.viatra.query.runtime.tabular.EcoreIndexHost;
 import org.eclipse.viatra.query.runtime.tabular.TabularIndexHost.TabularIndexScope;
 
-import org.eclipse.viatra.query.runtime.emf.EMFScope;
 import hu.bme.mit.inf.friends.FriendsFactory;
 import hu.bme.mit.inf.friends.FriendsPackage;
 import hu.bme.mit.inf.friends.People;
 import hu.bme.mit.inf.friends.Person;
-import hu.bme.mit.inf.friends.impl.FriendsFactoryImpl;
-import hu.bme.mit.inf.friends.impl.FriendsPackageImpl;
 import hu.bme.mit.inf.friends.queries.Friend;
 import hu.bme.mit.inf.friends.queries.Queries;
 
@@ -50,8 +48,8 @@ public class QueryRunner implements IApplication {
 	}
 	
 	private TabularIndexScope initializeTabularScope() {
-		FriendsFactory friendsFactory = FriendsFactoryImpl.init();
-		FriendsPackage friendsPackage = FriendsPackageImpl.init();
+		FriendsFactory friendsFactory = FriendsFactory.eINSTANCE;
+		FriendsPackage friendsPackage = FriendsPackage.eINSTANCE;
 		EcoreIndexHost ecoreIndexHost = new EcoreIndexHost(new SimpleLocalStorageBackend(), friendsPackage);
 
 		EClass peopleClass = friendsPackage.getPeople();
