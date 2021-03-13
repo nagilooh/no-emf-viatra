@@ -10,6 +10,7 @@ import org.eclipse.viatra.query.runtime.tabular.StringifiedndexHost;
 import org.eclipse.viatra.query.runtime.tabular.TabularIndexHost.TabularIndexScope;
 
 import hu.bme.mit.inf.friends.queries.HandCraftedFriend;
+import hu.bme.mit.inf.friends.queries.HandCraftedFriendCircle;
 import hu.bme.mit.inf.friends.queries.HandCraftedQueries;
 
 public class HandCraftedQueryRunner {
@@ -27,14 +28,18 @@ public class HandCraftedQueryRunner {
 		stringifiedndexHost.initFeatures("Friend");
 
 		ITableWriterUnary.Table<Object> tablePerson = stringifiedndexHost.getTableDirectInstances("Person");
-		String person1 = "James";	
-		String person2 = "Robert";
-		tablePerson.write(Direction.INSERT, person1);
-		tablePerson.write(Direction.INSERT, person2);
+		String[] people = {"0", "1", "2", "3", "4"};
+		for (String person : people) {
+			tablePerson.write(Direction.INSERT, person);
+		}
 		
 		ITableWriterBinary.Table<Object, Object> tablePerson_Friend = stringifiedndexHost.getTableFeatureSlots("Friend");
-		tablePerson_Friend.write(Direction.INSERT, person1, person2);
-		tablePerson_Friend.write(Direction.INSERT, person2, person1);
+		tablePerson_Friend.write(Direction.INSERT, people[0], people[1]);
+		tablePerson_Friend.write(Direction.INSERT, people[1], people[4]);
+		tablePerson_Friend.write(Direction.INSERT, people[4], people[0]);
+		tablePerson_Friend.write(Direction.INSERT, people[0], people[2]);
+		tablePerson_Friend.write(Direction.INSERT, people[3], people[2]);
+		tablePerson_Friend.write(Direction.INSERT, people[3], people[0]);
 				
 		return stringifiedndexHost.getScope();
 	}
@@ -52,11 +57,20 @@ public class HandCraftedQueryRunner {
 	private static void printAllMatches(ViatraQueryEngine engine) {
 		// Access pattern matcher
 //		Friend.Matcher matcher = Friend.Matcher.on(engine);
+		System.out.println("Friends:");
 		HandCraftedFriend.Matcher matcher = HandCraftedFriend.Matcher.on(engine);
 		// Get and iterate over all matches
 		for (HandCraftedFriend.Match match : matcher.getAllMatches()) {
 			// Print all the matches to the standard output
 			System.out.println(match.getP1() + ", " + match.getP2());
+		}
+		
+		System.out.println("In friend circles:");
+		HandCraftedFriendCircle.Matcher matcher2 = HandCraftedFriendCircle.Matcher.on(engine);
+		// Get and iterate over all matches
+		for (HandCraftedFriendCircle.Match match : matcher2.getAllMatches()) {
+			// Print all the matches to the standard output
+			System.out.println(match.getP());
 		}
 	}
 

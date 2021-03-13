@@ -1,11 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2010-2015, Bergmann Gabor, Istvan Rath and Daniel Varro
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v. 2.0 which is available at
- * http://www.eclipse.org/legal/epl-v20.html.
- * 
- * SPDX-License-Identifier: EPL-2.0
- *******************************************************************************/
 package org.eclipse.viatra.query.runtime.tabular;
 
 import java.util.Collection;
@@ -15,8 +7,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.viatra.query.runtime.emf.types.EStructuralFeatureInstancesKey;
 import org.eclipse.viatra.query.runtime.matchers.context.AbstractQueryMetaContext;
 import org.eclipse.viatra.query.runtime.matchers.context.IInputKey;
 import org.eclipse.viatra.query.runtime.matchers.context.InputKeyImplication;
@@ -24,13 +14,10 @@ import org.eclipse.viatra.query.runtime.tabular.types.BaseStringTypeKey;
 import org.eclipse.viatra.query.runtime.tabular.types.StringStructuralFeatureInstancesKey;
 
 /**
- * The meta context information for EMF scopes.
- * 
- * <p> The runtime context may specialize answers with a given scope. 
- * In a static context, a conservative default version ({@link #DEFAULT}) can be used instead. 
+ * The meta context information for String scopes.
  * 
  * <p> TODO generics? 
- * @author Bergmann Gabor
+ * @author Ficsor Attila
  *
  */
 public final class StringQueryMetaContext extends AbstractQueryMetaContext {

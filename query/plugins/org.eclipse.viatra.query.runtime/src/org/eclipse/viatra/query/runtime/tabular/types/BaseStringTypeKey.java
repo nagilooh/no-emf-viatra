@@ -1,14 +1,7 @@
-/**
- * 
- */
 package org.eclipse.viatra.query.runtime.tabular.types;
 
 import org.eclipse.viatra.query.runtime.matchers.context.common.BaseInputKeyWrapper;
 
-/**
- * @author Attila
- *
- */
 public abstract class BaseStringTypeKey<StringKey> extends BaseInputKeyWrapper<StringKey> {
 
     public BaseStringTypeKey(StringKey stringKey) {

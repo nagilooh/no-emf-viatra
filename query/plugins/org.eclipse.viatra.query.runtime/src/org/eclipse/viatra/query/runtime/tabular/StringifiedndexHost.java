@@ -1,12 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2010-2018, Gabor Bergmann, IncQuery Labs Ltd.
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v. 2.0 which is available at
- * http://www.eclipse.org/legal/epl-v20.html.
- * 
- * SPDX-License-Identifier: EPL-2.0
- *******************************************************************************/
-
 package org.eclipse.viatra.query.runtime.tabular;
 
 import java.util.Collections;
@@ -14,24 +5,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EClassifier;
-import org.eclipse.emf.ecore.EDataType;
-import org.eclipse.emf.ecore.EPackage;
-import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.viatra.query.runtime.api.scope.QueryScope;
-import org.eclipse.viatra.query.runtime.emf.EMFQueryMetaContext;
 import org.eclipse.viatra.query.runtime.emf.EMFScope;
-import org.eclipse.viatra.query.runtime.emf.types.EClassExactInstancesKey;
-import org.eclipse.viatra.query.runtime.emf.types.EClassTransitiveInstancesKey;
-import org.eclipse.viatra.query.runtime.emf.types.EDataTypeInSlotsKey;
-import org.eclipse.viatra.query.runtime.emf.types.EStructuralFeatureInstancesKey;
 import org.eclipse.viatra.query.runtime.matchers.context.IInputKey;
-import org.eclipse.viatra.query.runtime.matchers.context.common.JavaTransitiveInstancesKey;
 import org.eclipse.viatra.query.runtime.matchers.scopes.IStorageBackend;
 import org.eclipse.viatra.query.runtime.matchers.scopes.SimpleRuntimeContext;
-import org.eclipse.viatra.query.runtime.matchers.scopes.tables.DisjointUnionTable;
 import org.eclipse.viatra.query.runtime.matchers.scopes.tables.ITableWriterBinary;
 import org.eclipse.viatra.query.runtime.matchers.scopes.tables.ITableWriterUnary;
 import org.eclipse.viatra.query.runtime.matchers.util.CollectionsFactory;
@@ -39,12 +17,12 @@ import org.eclipse.viatra.query.runtime.tabular.types.StringExactInstancesKey;
 import org.eclipse.viatra.query.runtime.tabular.types.StringStructuralFeatureInstancesKey;
 
 /**
- * Simple EMF-specific demo tabular index host. 
+ * Simple String-specific demo tabular index host. 
  * 
  * <p> Usage: <ul>
- * <li> First, instantiate index host with given Ecore metamodel packages
- * <li> To emulate an EMF instance model, write arbitrary content into the tables using {@link #getTableDirectInstances(EClassifier)} and {@link #getTableFeatureSlots(EStructuralFeature)}.
- * <li> Initialize and evaluate regular EMF-based Viatra queries on the scope provided by {@link #getScope()}, as you would on an {@link EMFScope}. 
+ * <li> First, instantiate index host with given table and relation names
+ * <li> Write arbitrary content into the tables using {@link #getTableDirectInstances(String)} and {@link #getTableFeatureSlots(String)}.
+ * <li> Initialize and evaluate String-based Viatra queries on the scope provided by {@link #getScope()}, as you would on any other scope (e.g. {@link EMFScope}). 
  * <ul> 
  * 
  * <p>
@@ -52,12 +30,11 @@ import org.eclipse.viatra.query.runtime.tabular.types.StringStructuralFeatureIns
  * part of a work in progress. There is no guarantee that this API will
  * work or that it will remain the same.
  *
- * @author Gabor Bergmann
- * @since 2.1
+ * @author Ficsor Attila
  */
 public class StringifiedndexHost extends TabularIndexHost {
 	
-	public StringifiedndexHost(IStorageBackend storage, EPackage... packages) {
+	public StringifiedndexHost(IStorageBackend storage) {
 		super(storage, new SimpleRuntimeContext(new StringQueryMetaContext()));
 		
 //		initTables(packages);
@@ -86,88 +63,9 @@ public class StringifiedndexHost extends TabularIndexHost {
         return false;
     }
 	
-//	private Map<EClassifier, ITableWriterUnary.Table<Object>> tableDirectInstances = CollectionsFactory.createMap();
-//	private Map<EClass, DisjointUnionTable> tableTransitiveInstances = CollectionsFactory.createMap();
-//	private Map<EStructuralFeature, ITableWriterBinary.Table<Object, Object>> tableFeatures = CollectionsFactory.createMap();
 	private Map<String, ITableWriterUnary.Table<Object>> tableDirectInstances = CollectionsFactory.createMap();
-	private Map<String, DisjointUnionTable> tableTransitiveInstances = CollectionsFactory.createMap();
 	private Map<String, ITableWriterBinary.Table<Object, Object>> tableFeatures = CollectionsFactory.createMap();
 	
-	private void initTables(EPackage[] packages) {
-		
-		// create instance tables first
-		for (EPackage ePackage : packages) {
-			for (EClassifier eClassifier : ePackage.getEClassifiers()) {
-				boolean unique;
-				IInputKey classifierKey;
-				if (eClassifier instanceof EClass) {
-					EClass eClass = (EClass) eClassifier;
-
-					// create transitive instances table
-					IInputKey transitiveKey = new EClassTransitiveInstancesKey(eClass);
-					DisjointUnionTable transitiveTable = registerNewTable(new DisjointUnionTable(transitiveKey, runtimeContext));
-					tableTransitiveInstances.put(eClass.getName(), transitiveTable);
-					
-					// process feature tables 
-					for (EStructuralFeature feature : eClass.getEStructuralFeatures()) {
-						IInputKey featureKey = new EStructuralFeatureInstancesKey(feature);
-						ITableWriterBinary.Table<Object, Object> featureTable = newBinaryInputTable(featureKey, feature.isUnique());
-						tableFeatures.put(feature.getName(), featureTable);
-					}
-					
-					// direct instance table
-					unique = true;
-					classifierKey = new EClassExactInstancesKey(eClass);
-				} else { // datatype
-					unique = false;
-					classifierKey = new EDataTypeInSlotsKey((EDataType) eClassifier);
-				}
-				ITableWriterUnary.Table<Object> directTable = newUnaryInputTable(classifierKey, unique);
-				tableDirectInstances.put(eClassifier.getName(), directTable);
-			}
-		}
-		
-		// global implicit supertype EObject is always available as a transitive table
-		EClass eObjectClass = EcorePackage.eINSTANCE.getEObject();
-		DisjointUnionTable eObjectAllInstancesTable = tableTransitiveInstances.get(eObjectClass);
-		if (eObjectAllInstancesTable == null) { // is it already added?
-			IInputKey transitiveKey = new EClassTransitiveInstancesKey(eObjectClass);
-			eObjectAllInstancesTable = registerNewTable(new DisjointUnionTable(transitiveKey, runtimeContext));
-			tableTransitiveInstances.put(eObjectClass.getName(), eObjectAllInstancesTable);
-			
-			boolean unique = true;
-			IInputKey classifierKey = new EClassExactInstancesKey(eObjectClass);
-			ITableWriterUnary.Table<Object> directTable = newUnaryInputTable(classifierKey, unique);
-			tableDirectInstances.put(eObjectClass.getName(), directTable);
-		}
-		
-		// set up disjoint unoin tables
-		for (Entry<String, DisjointUnionTable> entry : tableTransitiveInstances.entrySet()) {
-			String eClass = entry.getKey();
-			ITableWriterUnary.Table<Object> directTable = tableDirectInstances.get(eClass);
-			
-			// the direct type itself is a child
-			entry.getValue().addChildTable(directTable);
-			
-			// connect supertypes
-//			for (EClass superClass : eClass.getEAllSuperTypes()) {
-//				DisjointUnionTable transitiveTable = tableTransitiveInstances.get(superClass);
-//				if (transitiveTable == null) {
-//				    throw new IllegalStateException(
-//				            String.format("No index table found for EClass %s, supertype of %s",
-//                                    superClass.getName(), eClass.getName())
-//                    );
-//                }
-//				transitiveTable.addChildTable(directTable);
-//			}
-			// global implicit supertype
-			if (!eClass.equals(eObjectClass)) {
-				eObjectAllInstancesTable.addChildTable(directTable);
-			}
-				
-		}
-		
-	}
 	
 	public ITableWriterUnary.Table<Object> getTableDirectInstances(String classifier) {
 		return tableDirectInstances.get(classifier);
