@@ -6,7 +6,6 @@ import hu.bme.mit.inf.friends.FriendsFactory;
 import hu.bme.mit.inf.friends.FriendsPackage;
 import hu.bme.mit.inf.friends.People;
 import hu.bme.mit.inf.friends.Person;
-
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;

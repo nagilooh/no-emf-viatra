@@ -5,3 +5,7 @@ import "http://www.inf.mit.bme.hu/friends"
 pattern friend(p1 : Person, p2 : Person) {
 	Person.friend(p1, p2);
 }
+
+pattern friendCircle(p : Person) {
+	Person.friend+(p, p);
+}

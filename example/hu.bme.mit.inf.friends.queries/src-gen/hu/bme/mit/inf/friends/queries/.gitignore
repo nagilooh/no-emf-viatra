@@ -2,3 +2,5 @@
 /.Queries.java._trace
 /Friend.java
 /Queries.java
+*.java._trace
+/FriendCircle.java

@@ -4,7 +4,6 @@ package hu.bme.mit.inf.friends.impl;
 
 import hu.bme.mit.inf.friends.FriendsPackage;
 import hu.bme.mit.inf.friends.Person;
-
 import java.util.Collection;
 
 import org.eclipse.emf.common.notify.Notification;

@@ -15,21 +15,22 @@ import org.eclipse.viatra.query.runtime.matchers.scopes.tables.ITableWriterBinar
 import org.eclipse.viatra.query.runtime.matchers.scopes.tables.ITableWriterUnary;
 import org.eclipse.viatra.query.runtime.matchers.util.Direction;
 import org.eclipse.viatra.query.runtime.tabular.EcoreIndexHost;
+import org.eclipse.viatra.query.runtime.tabular.StringifiedndexHost;
 import org.eclipse.viatra.query.runtime.tabular.TabularIndexHost.TabularIndexScope;
 
 import hu.bme.mit.inf.friends.FriendsFactory;
 import hu.bme.mit.inf.friends.FriendsPackage;
-import hu.bme.mit.inf.friends.People;
 import hu.bme.mit.inf.friends.Person;
-import hu.bme.mit.inf.friends.queries.Friend;
-import hu.bme.mit.inf.friends.queries.Queries;
+import hu.bme.mit.inf.friends.queries.HandCraftedFriend;
+import hu.bme.mit.inf.friends.queries.HandCraftedQueries;
 
 public class QueryRunner implements IApplication {
 
 	@Override
 	public Object start(IApplicationContext context) throws Exception {
         // Return value 0 is considered as a successful execution on Unix systems
-		QueryScope scope = initializeTabularScope();
+//		QueryScope scope = initializeTabularScope();
+		QueryScope scope = initializeStringifiedScope();
 		ViatraQueryEngine viatraQueryEngine = prepareQueryEngine(scope);
 		printAllMatches(viatraQueryEngine);
 		return 0;
@@ -50,16 +51,13 @@ public class QueryRunner implements IApplication {
 	private TabularIndexScope initializeTabularScope() {
 		FriendsFactory friendsFactory = FriendsFactory.eINSTANCE;
 		FriendsPackage friendsPackage = FriendsPackage.eINSTANCE;
-		EcoreIndexHost ecoreIndexHost = new EcoreIndexHost(new SimpleLocalStorageBackend(), friendsPackage);
+		SimpleLocalStorageBackend storage = new SimpleLocalStorageBackend();
+		EcoreIndexHost ecoreIndexHost = new EcoreIndexHost(storage, friendsPackage);
 
-		EClass peopleClass = friendsPackage.getPeople();
 		EClass personClass = friendsPackage.getPerson();
-		EReference people_Person = friendsPackage.getPeople_Person();
 		EReference person_Friend = friendsPackage.getPerson_Friend();
-
-		ITableWriterUnary.Table<Object> tablePeople = ecoreIndexHost.getTableDirectInstances(peopleClass);
-		People people = friendsFactory.createPeople();
-		tablePeople.write(Direction.INSERT, people);
+		System.out.println(personClass);
+		System.out.println(person_Friend);
 
 		ITableWriterUnary.Table<Object> tablePerson = ecoreIndexHost.getTableDirectInstances(personClass);
 		Person person1 = friendsFactory.createPerson();
@@ -69,10 +67,6 @@ public class QueryRunner implements IApplication {
 		tablePerson.write(Direction.INSERT, person1);
 		tablePerson.write(Direction.INSERT, person2);
 		
-		ITableWriterBinary.Table<Object, Object> tablePeople_Person = ecoreIndexHost.getTableFeatureSlots(people_Person);
-		tablePeople_Person.write(Direction.INSERT, people, person1);
-		tablePeople_Person.write(Direction.INSERT, people, person2);
-		
 		ITableWriterBinary.Table<Object, Object> tablePerson_Friend = ecoreIndexHost.getTableFeatureSlots(person_Friend);
 		tablePerson_Friend.write(Direction.INSERT, person1, person2);
 		tablePerson_Friend.write(Direction.INSERT, person2, person1);
@@ -80,21 +74,41 @@ public class QueryRunner implements IApplication {
 		return ecoreIndexHost.getScope();
 	}
 	
+	private TabularIndexScope initializeStringifiedScope() {
+		SimpleLocalStorageBackend storage = new SimpleLocalStorageBackend();
+		StringifiedndexHost stringifiedndexHost = new StringifiedndexHost(storage);
+		stringifiedndexHost.initDirectInstances("Person");
+		stringifiedndexHost.initFeatures("Friend");
+
+		ITableWriterUnary.Table<Object> tablePerson = stringifiedndexHost.getTableDirectInstances("Person");
+		String person1 = "James";	
+		String person2 = "Robert";
+		tablePerson.write(Direction.INSERT, person1);
+		tablePerson.write(Direction.INSERT, person2);
+		
+		ITableWriterBinary.Table<Object, Object> tablePerson_Friend = stringifiedndexHost.getTableFeatureSlots("Friend");
+		tablePerson_Friend.write(Direction.INSERT, person1, person2);
+		tablePerson_Friend.write(Direction.INSERT, person2, person1);
+				
+		return stringifiedndexHost.getScope();
+	}
+	
 	private ViatraQueryEngine prepareQueryEngine(QueryScope scope) {
 		// Access managed query engine
 	    ViatraQueryEngine engine = ViatraQueryEngine.on(scope);
 
 	    // Initialize all queries on engine
-		Queries.instance().prepare(engine);
+		HandCraftedQueries.instance().prepare(engine);
 
 		return engine;
 	}
 	
 	private void printAllMatches(ViatraQueryEngine engine) {
 		// Access pattern matcher
-		Friend.Matcher matcher = Friend.Matcher.on(engine);
+//		Friend.Matcher matcher = Friend.Matcher.on(engine);
+		HandCraftedFriend.Matcher matcher = HandCraftedFriend.Matcher.on(engine);
 		// Get and iterate over all matches
-		for (Friend.Match match : matcher.getAllMatches()) {
+		for (HandCraftedFriend.Match match : matcher.getAllMatches()) {
 			// Print all the matches to the standard output
 			System.out.println(match.getP1() + ", " + match.getP2());
 		}
