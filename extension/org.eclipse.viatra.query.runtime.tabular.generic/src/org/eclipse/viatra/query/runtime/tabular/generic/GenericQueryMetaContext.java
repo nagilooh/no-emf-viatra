@@ -1,4 +1,4 @@
-package org.eclipse.viatra.query.runtime.tabular;
+package org.eclipse.viatra.query.runtime.tabular.generic;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -10,17 +10,13 @@ import java.util.Set;
 import org.eclipse.viatra.query.runtime.matchers.context.AbstractQueryMetaContext;
 import org.eclipse.viatra.query.runtime.matchers.context.IInputKey;
 import org.eclipse.viatra.query.runtime.matchers.context.InputKeyImplication;
-import org.eclipse.viatra.query.runtime.tabular.types.BaseStringTypeKey;
-import org.eclipse.viatra.query.runtime.tabular.types.StringStructuralFeatureInstancesKey;
+import org.eclipse.viatra.query.runtime.tabular.generic.types.BaseGenericTypeKey;
+import org.eclipse.viatra.query.runtime.tabular.generic.types.StringStructuralFeatureInstancesKey;
 
 /**
  * The meta context information for String scopes.
- * 
- * <p> TODO generics? 
- * @author Ficsor Attila
- *
  */
-public final class StringQueryMetaContext extends AbstractQueryMetaContext {
+public final class GenericQueryMetaContext extends AbstractQueryMetaContext {
 
 	@Override
 	public boolean isEnumerable(IInputKey key) {		
@@ -31,7 +27,7 @@ public final class StringQueryMetaContext extends AbstractQueryMetaContext {
 	@Override
 	public boolean isStateless(IInputKey key) {
         ensureValidKey(key);
-        return key instanceof BaseStringTypeKey<?>;
+        return key instanceof BaseGenericTypeKey<?>;
 	}
 
 	@Override
@@ -51,12 +47,12 @@ public final class StringQueryMetaContext extends AbstractQueryMetaContext {
     }
 
     public void ensureValidKey(IInputKey key) {
-        if (! (key instanceof BaseStringTypeKey<?>))
+        if (! (key instanceof BaseGenericTypeKey<?>))
             illegalInputKey(key);
     }
 
     public void illegalInputKey(IInputKey key) {
-        throw new IllegalArgumentException("The input key " + key + " is not a valid String input key.");
+        throw new IllegalArgumentException("The input key " + key + " is not a valid input key.");
     }
 	
 }

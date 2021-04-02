@@ -1,14 +1,14 @@
-package org.eclipse.viatra.query.runtime.tabular.types;
+package org.eclipse.viatra.query.runtime.tabular.generic.types;
 
 import org.eclipse.viatra.query.runtime.matchers.context.common.BaseInputKeyWrapper;
 
-public abstract class BaseStringTypeKey<StringKey> extends BaseInputKeyWrapper<StringKey> {
+public abstract class BaseGenericTypeKey<GenericKey> extends BaseInputKeyWrapper<GenericKey> {
 
-    public BaseStringTypeKey(StringKey stringKey) {
+    public BaseGenericTypeKey(GenericKey stringKey) {
         super(stringKey);
     }
 
-    public StringKey getStringKey() {
+    public GenericKey getGenericKey() {
         return getWrappedKey();
     }
     

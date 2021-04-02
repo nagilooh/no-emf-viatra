@@ -15,7 +15,7 @@ import org.eclipse.viatra.query.runtime.matchers.scopes.tables.ITableWriterBinar
 import org.eclipse.viatra.query.runtime.matchers.scopes.tables.ITableWriterUnary;
 import org.eclipse.viatra.query.runtime.matchers.util.Direction;
 import org.eclipse.viatra.query.runtime.tabular.EcoreIndexHost;
-import org.eclipse.viatra.query.runtime.tabular.StringifiedndexHost;
+import org.eclipse.viatra.query.runtime.tabular.generic.GenricIndexHost;
 import org.eclipse.viatra.query.runtime.tabular.TabularIndexHost.TabularIndexScope;
 
 import hu.bme.mit.inf.friends.FriendsFactory;
@@ -76,7 +76,7 @@ public class QueryRunner implements IApplication {
 	
 	private TabularIndexScope initializeStringifiedScope() {
 		SimpleLocalStorageBackend storage = new SimpleLocalStorageBackend();
-		StringifiedndexHost stringifiedndexHost = new StringifiedndexHost(storage);
+		GenricIndexHost stringifiedndexHost = new GenricIndexHost(storage);
 		stringifiedndexHost.initDirectInstances("Person");
 		stringifiedndexHost.initFeatures("Friend");
 

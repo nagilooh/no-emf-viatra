@@ -3,45 +3,56 @@ package hu.bme.mit.inf.friends.queries.runner;
 import org.eclipse.viatra.query.runtime.api.ViatraQueryEngine;
 import org.eclipse.viatra.query.runtime.api.scope.QueryScope;
 import org.eclipse.viatra.query.runtime.matchers.scopes.SimpleLocalStorageBackend;
-import org.eclipse.viatra.query.runtime.matchers.scopes.tables.ITableWriterBinary;
-import org.eclipse.viatra.query.runtime.matchers.scopes.tables.ITableWriterUnary;
-import org.eclipse.viatra.query.runtime.matchers.util.Direction;
-import org.eclipse.viatra.query.runtime.tabular.StringifiedndexHost;
 import org.eclipse.viatra.query.runtime.tabular.TabularIndexHost.TabularIndexScope;
+import org.eclipse.viatra.query.runtime.tabular.generic.GenricIndexHost;
 
 import hu.bme.mit.inf.friends.queries.HandCraftedFriend;
 import hu.bme.mit.inf.friends.queries.HandCraftedFriendCircle;
 import hu.bme.mit.inf.friends.queries.HandCraftedQueries;
 
 public class HandCraftedQueryRunner {
+	static GenricIndexHost stringifiedndexHost;
 
 	public static void main(String[] args) {
 		QueryScope scope = initializeStringifiedScope();
 		ViatraQueryEngine viatraQueryEngine = prepareQueryEngine(scope);
 		printAllMatches(viatraQueryEngine);
+		modifyModel();
+		printAllMatches(viatraQueryEngine);
 	}
 	
 	private static TabularIndexScope initializeStringifiedScope() {
 		SimpleLocalStorageBackend storage = new SimpleLocalStorageBackend();
-		StringifiedndexHost stringifiedndexHost = new StringifiedndexHost(storage);
+		stringifiedndexHost = new GenricIndexHost(storage);
+		
+		// Initialize table for Person instances
 		stringifiedndexHost.initDirectInstances("Person");
+
+		// Initialize table for Friend references
 		stringifiedndexHost.initFeatures("Friend");
 
-		ITableWriterUnary.Table<Object> tablePerson = stringifiedndexHost.getTableDirectInstances("Person");
 		String[] people = {"0", "1", "2", "3", "4"};
 		for (String person : people) {
-			tablePerson.write(Direction.INSERT, person);
+			stringifiedndexHost.addInstance("Person", person);
 		}
 		
-		ITableWriterBinary.Table<Object, Object> tablePerson_Friend = stringifiedndexHost.getTableFeatureSlots("Friend");
-		tablePerson_Friend.write(Direction.INSERT, people[0], people[1]);
-		tablePerson_Friend.write(Direction.INSERT, people[1], people[4]);
-		tablePerson_Friend.write(Direction.INSERT, people[4], people[0]);
-		tablePerson_Friend.write(Direction.INSERT, people[0], people[2]);
-		tablePerson_Friend.write(Direction.INSERT, people[3], people[2]);
-		tablePerson_Friend.write(Direction.INSERT, people[3], people[0]);
+		stringifiedndexHost.addFeature("Friend", people[0], people[1]);
+		stringifiedndexHost.addFeature("Friend", people[1], people[4]);
+		stringifiedndexHost.addFeature("Friend", people[4], people[0]);
+		stringifiedndexHost.addFeature("Friend", people[0], people[2]);
+		stringifiedndexHost.addFeature("Friend", people[3], people[2]);
+		stringifiedndexHost.addFeature("Friend", people[3], people[0]);
 				
 		return stringifiedndexHost.getScope();
+	}
+	
+	private static void modifyModel() {
+		stringifiedndexHost.addInstance("Person", "Pali");
+		stringifiedndexHost.removeInstance("Person", "2");
+		stringifiedndexHost.addFeature("Friend", "0", "Pali");
+		stringifiedndexHost.addFeature("Friend", "Pali", "4");
+		
+		
 	}
 	
 	private static ViatraQueryEngine prepareQueryEngine(QueryScope scope) {

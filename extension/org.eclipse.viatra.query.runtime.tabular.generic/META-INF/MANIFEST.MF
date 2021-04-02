@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: hu.bme.mit.inf.friends.queries
+Bundle-SymbolicName: hu.bme.mit.inf.friends.queries;singleton:=true
+Bundle-Version: 0.0.1.qualifier
+Export-Package: org.eclipse.viatra.query.runtime.tabular.generic,
+ org.eclipse.viatra.query.runtime.tabular.generic.types
+Require-Bundle: org.eclipse.viatra.query.runtime,
+ org.eclipse.viatra.query.runtime.matchers
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Import-Package: org.apache.log4j

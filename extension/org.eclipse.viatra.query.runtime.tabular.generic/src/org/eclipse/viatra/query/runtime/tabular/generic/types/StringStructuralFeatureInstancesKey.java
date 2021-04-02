@@ -1,6 +1,6 @@
-package org.eclipse.viatra.query.runtime.tabular.types;
+package org.eclipse.viatra.query.runtime.tabular.generic.types;
 
-public class StringStructuralFeatureInstancesKey extends BaseStringTypeKey<String> {
+public class StringStructuralFeatureInstancesKey extends BaseGenericTypeKey<String> {
     
     public StringStructuralFeatureInstancesKey(String stringKey) {
         super(stringKey);

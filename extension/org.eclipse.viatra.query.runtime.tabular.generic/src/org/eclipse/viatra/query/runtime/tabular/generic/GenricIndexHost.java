@@ -1,4 +1,4 @@
-package org.eclipse.viatra.query.runtime.tabular;
+package org.eclipse.viatra.query.runtime.tabular.generic;
 
 import java.util.Collections;
 import java.util.Map;
@@ -13,8 +13,10 @@ import org.eclipse.viatra.query.runtime.matchers.scopes.SimpleRuntimeContext;
 import org.eclipse.viatra.query.runtime.matchers.scopes.tables.ITableWriterBinary;
 import org.eclipse.viatra.query.runtime.matchers.scopes.tables.ITableWriterUnary;
 import org.eclipse.viatra.query.runtime.matchers.util.CollectionsFactory;
-import org.eclipse.viatra.query.runtime.tabular.types.StringExactInstancesKey;
-import org.eclipse.viatra.query.runtime.tabular.types.StringStructuralFeatureInstancesKey;
+import org.eclipse.viatra.query.runtime.matchers.util.Direction;
+import org.eclipse.viatra.query.runtime.tabular.TabularIndexHost;
+import org.eclipse.viatra.query.runtime.tabular.generic.types.StringExactInstancesKey;
+import org.eclipse.viatra.query.runtime.tabular.generic.types.StringStructuralFeatureInstancesKey;
 
 /**
  * Simple String-specific demo tabular index host. 
@@ -30,22 +32,20 @@ import org.eclipse.viatra.query.runtime.tabular.types.StringStructuralFeatureIns
  * part of a work in progress. There is no guarantee that this API will
  * work or that it will remain the same.
  *
- * @author Ficsor Attila
  */
-public class StringifiedndexHost extends TabularIndexHost {
+public class GenricIndexHost extends TabularIndexHost {
 	
-	public StringifiedndexHost(IStorageBackend storage) {
-		super(storage, new SimpleRuntimeContext(new StringQueryMetaContext()));
+	public GenricIndexHost(IStorageBackend storage) {
+		super(storage, new SimpleRuntimeContext(new GenericQueryMetaContext()));
 		
 //		initTables(packages);
 	}
 	
 	public void initDirectInstances(String... types) {
 		for (String type : types) {
-			boolean unique = true;
 			IInputKey classifierKey = new StringExactInstancesKey(type);
 			
-			ITableWriterUnary.Table<Object> directTable = newUnaryInputTable(classifierKey, unique);
+			ITableWriterUnary.Table<Object> directTable = newUnaryInputTable(classifierKey, true);
 			tableDirectInstances.put(type, directTable);
 		}
 	}
@@ -73,7 +73,24 @@ public class StringifiedndexHost extends TabularIndexHost {
 	public ITableWriterBinary.Table<Object, Object> getTableFeatureSlots(String feature) {
 		return tableFeatures.get(feature);
 	}
+	
+	public void addInstance(String classifier, Object value) {
+		tableDirectInstances.get(classifier).write(Direction.INSERT, value);
+	}
+	
+	public void removeInstance(String classifier, Object value) {
+		tableDirectInstances.get(classifier).write(Direction.DELETE, value);
+	}
 
+	
+	public void addFeature(String classifier, Object source, Object target) {
+		tableFeatures.get(classifier).write(Direction.INSERT, source, target);
+	}
+
+	
+	public void removeFeature(String classifier, Object source, Object target) {
+		tableFeatures.get(classifier).write(Direction.DELETE, source, target);
+	}
 
 	
     public Set<Entry<String, ITableWriterUnary.Table<Object>>> getAllCurrentTablesDirectInstances() {

@@ -1,6 +1,6 @@
-package org.eclipse.viatra.query.runtime.tabular.types;
+package org.eclipse.viatra.query.runtime.tabular.generic.types;
 
-public class StringExactInstancesKey extends BaseStringTypeKey<String> {
+public class StringExactInstancesKey extends BaseGenericTypeKey<String> {
 
 	public StringExactInstancesKey(String stringKey) {
 		super(stringKey);
