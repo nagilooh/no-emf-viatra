@@ -7,6 +7,7 @@ import org.eclipse.viatra.query.runtime.tabular.TabularIndexHost.TabularIndexSco
 import org.eclipse.viatra.query.runtime.tabular.generic.GenricIndexHost;
 
 import hu.bme.mit.inf.friends.queries.HandCraftedFriend;
+import hu.bme.mit.inf.friends.queries.HandCraftedFriend2;
 import hu.bme.mit.inf.friends.queries.HandCraftedFriendCircle;
 import hu.bme.mit.inf.friends.queries.HandCraftedQueries;
 
@@ -74,6 +75,14 @@ public class HandCraftedQueryRunner {
 		for (HandCraftedFriend.Match match : matcher.getAllMatches()) {
 			// Print all the matches to the standard output
 			System.out.println(match.getP1() + ", " + match.getP2());
+		}
+
+		System.out.println("Friends2:");
+		HandCraftedFriend2.Matcher matcher3 = HandCraftedFriend2.Matcher.on(engine);
+		// Get and iterate over all matches
+		for (HandCraftedFriend2.Match match3 : matcher3.getAllMatches()) {
+			// Print all the matches to the standard output
+			System.out.println(match3.getP1() + ", " + match3.getP2());
 		}
 		
 		System.out.println("In friend circles:");

@@ -41,6 +41,7 @@ public final class HandCraftedQueries extends BaseGeneratedPatternGroup {
   
   private HandCraftedQueries() {
     querySpecifications.add(HandCraftedFriend.instance());
+    querySpecifications.add(HandCraftedFriend2.instance());
     querySpecifications.add(HandCraftedFriendCircle.instance());
   }
   
@@ -50,6 +51,14 @@ public final class HandCraftedQueries extends BaseGeneratedPatternGroup {
   
   public HandCraftedFriend.Matcher getFriend(final ViatraQueryEngine engine) {
     return HandCraftedFriend.Matcher.on(engine);
+  }
+  
+  public HandCraftedFriend2 getFriend2() {
+    return HandCraftedFriend2.instance();
+  }
+  
+  public HandCraftedFriend2.Matcher getFriend2(final ViatraQueryEngine engine) {
+    return HandCraftedFriend2.Matcher.on(engine);
   }
   
   public HandCraftedFriendCircle getFriendCircle() {
