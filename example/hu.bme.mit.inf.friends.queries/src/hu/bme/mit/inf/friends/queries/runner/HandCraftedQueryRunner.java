@@ -1,6 +1,10 @@
 package hu.bme.mit.inf.friends.queries.runner;
 
+import org.eclipse.viatra.query.runtime.api.GenericPatternMatch;
+import org.eclipse.viatra.query.runtime.api.GenericPatternMatcher;
 import org.eclipse.viatra.query.runtime.api.ViatraQueryEngine;
+import org.eclipse.viatra.query.runtime.api.generic.BuiltPQuery;
+import org.eclipse.viatra.query.runtime.api.generic.TabularQuerySpecification;
 import org.eclipse.viatra.query.runtime.api.scope.QueryScope;
 import org.eclipse.viatra.query.runtime.matchers.scopes.SimpleLocalStorageBackend;
 import org.eclipse.viatra.query.runtime.tabular.TabularIndexHost.TabularIndexScope;
@@ -61,7 +65,7 @@ public class HandCraftedQueryRunner {
 	    ViatraQueryEngine engine = ViatraQueryEngine.on(scope);
 
 	    // Initialize all queries on engine
-		HandCraftedQueries.instance().prepare(engine);
+//		HandCraftedQueries.instance().prepare(engine);
 
 		return engine;
 	}
@@ -91,6 +95,22 @@ public class HandCraftedQueryRunner {
 		for (HandCraftedFriendCircle.Match match : matcher2.getAllMatches()) {
 			// Print all the matches to the standard output
 			System.out.println(match.getP());
+		}
+		
+		System.out.println("Fully handmade freind:");
+
+		BuiltPQuery query = new BuiltPQuery("hu.bme.mit.inf.friends.queries.fully_hand_made_friend")
+				.addParameter("p1", "Person")
+				.addParameter("p2", "Person")
+				.addBody()
+				.addConstraint("Person", "p1")
+				.addConstraint("Person", "p2")
+				.addConstraint("Friend", "p1", "p2");
+		
+		TabularQuerySpecification querySpecification = new TabularQuerySpecification(query);
+		GenericPatternMatcher matcher_test = querySpecification.getMatcher(engine);
+		for (GenericPatternMatch match : matcher_test.getAllMatches()) {
+			System.out.println(match.toString());
 		}
 	}
 
