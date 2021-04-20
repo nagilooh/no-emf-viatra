@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.viatra.query.runtime.api.IPatternMatch;
 import org.eclipse.viatra.query.runtime.api.IQuerySpecification;
 import org.eclipse.viatra.query.runtime.api.ViatraQueryEngine;
-import org.eclipse.viatra.query.runtime.api.generic.BuiltPQuery;
+import org.eclipse.viatra.query.runtime.api.generic.TabularPQuery;
 import org.eclipse.viatra.query.runtime.api.impl.BaseGeneratedEMFQuerySpecification;
 import org.eclipse.viatra.query.runtime.api.impl.BaseMatcher;
 import org.eclipse.viatra.query.runtime.api.impl.BasePatternMatch;
@@ -695,7 +695,7 @@ public final class HandCraftedFriend2 extends BaseGeneratedEMFQuerySpecification
 	private static class LazyHolder {
 		
 		private static PQuery buildQuery() {
-			BuiltPQuery query = new BuiltPQuery("hu.bme.mit.inf.friends.queries.friend2")
+			TabularPQuery query = new TabularPQuery("hu.bme.mit.inf.friends.queries.friend2")
 				.addParameter("p1", "Person")
 				.addParameter("p2", "Person")
 				.addBody()

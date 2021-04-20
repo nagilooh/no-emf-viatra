@@ -1,12 +1,13 @@
 package org.eclipse.viatra.query.runtime.api.generic;
 
 import org.eclipse.viatra.query.runtime.api.GenericPatternMatcher;
+import org.eclipse.viatra.query.runtime.api.GenericQuerySpecification;
 import org.eclipse.viatra.query.runtime.api.ViatraQueryEngine;
 import org.eclipse.viatra.query.runtime.api.scope.QueryScope;
 import org.eclipse.viatra.query.runtime.matchers.psystem.queries.PQuery;
 import org.eclipse.viatra.query.runtime.tabular.TabularIndexHost.TabularIndexScope;
 
-public class TabularQuerySpecification extends org.eclipse.viatra.query.runtime.api.GenericQuerySpecification<GenericPatternMatcher> {
+public class TabularQuerySpecification extends GenericQuerySpecification<GenericPatternMatcher> {
 
 	public TabularQuerySpecification(PQuery wrappedPQuery) {
 		super(wrappedPQuery);

@@ -3,7 +3,7 @@ package hu.bme.mit.inf.friends.queries.runner;
 import org.eclipse.viatra.query.runtime.api.GenericPatternMatch;
 import org.eclipse.viatra.query.runtime.api.GenericPatternMatcher;
 import org.eclipse.viatra.query.runtime.api.ViatraQueryEngine;
-import org.eclipse.viatra.query.runtime.api.generic.BuiltPQuery;
+import org.eclipse.viatra.query.runtime.api.generic.TabularPQuery;
 import org.eclipse.viatra.query.runtime.api.generic.TabularQuerySpecification;
 import org.eclipse.viatra.query.runtime.api.scope.QueryScope;
 import org.eclipse.viatra.query.runtime.matchers.scopes.SimpleLocalStorageBackend;
@@ -13,7 +13,6 @@ import org.eclipse.viatra.query.runtime.tabular.generic.GenricIndexHost;
 import hu.bme.mit.inf.friends.queries.HandCraftedFriend;
 import hu.bme.mit.inf.friends.queries.HandCraftedFriend2;
 import hu.bme.mit.inf.friends.queries.HandCraftedFriendCircle;
-import hu.bme.mit.inf.friends.queries.HandCraftedQueries;
 
 public class HandCraftedQueryRunner {
 	static GenricIndexHost stringifiedndexHost;
@@ -97,16 +96,20 @@ public class HandCraftedQueryRunner {
 			System.out.println(match.getP());
 		}
 		
-		System.out.println("Fully handmade freind:");
+		System.out.println("Fully handmade friend:");
 
-		BuiltPQuery query = new BuiltPQuery("hu.bme.mit.inf.friends.queries.fully_hand_made_friend")
+		TabularPQuery query = new TabularPQuery("hu.bme.mit.inf.friends.queries.fully_hand_made_friend")
 				.addParameter("p1", "Person")
 				.addParameter("p2", "Person")
 				.addBody()
 				.addConstraint("Person", "p1")
 				.addConstraint("Person", "p2")
 				.addConstraint("Friend", "p1", "p2");
-		
+//		query = new TabularPQuery("hu.bme.mit.inf.friends.queries.fully_hand_made_friend2")
+//				.addParameter("p1", "Person")
+//				.addParameter("p2", "Person")
+//				.addBody()
+//				.addBinaryReflexiveTransitiveClosure(query, "p1", "p2");
 		TabularQuerySpecification querySpecification = new TabularQuerySpecification(query);
 		GenericPatternMatcher matcher_test = querySpecification.getMatcher(engine);
 		for (GenericPatternMatch match : matcher_test.getAllMatches()) {

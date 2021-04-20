@@ -29,14 +29,14 @@ import org.eclipse.viatra.query.runtime.matchers.tuple.Tuples;
 import org.eclipse.viatra.query.runtime.tabular.generic.types.StringExactInstancesKey;
 import org.eclipse.viatra.query.runtime.tabular.generic.types.StringStructuralFeatureInstancesKey;
 
-public class BuiltPQuery extends BasePQuery {
+public class TabularPQuery extends BasePQuery {
 
     private final Map<String, PParameter> parameters = new HashMap<String, PParameter>();
     private String fullyQualifiedName;
     private Queue<PBody> bodies = new LinkedList<PBody>();
     private List<ExportedParameter> symbolicParameters;
 	
-    public BuiltPQuery(String fullyQualifiedName) {
+    public TabularPQuery(String fullyQualifiedName) {
       super(PVisibility.PUBLIC);
       this.fullyQualifiedName = fullyQualifiedName;
     }
@@ -46,11 +46,11 @@ public class BuiltPQuery extends BasePQuery {
 		return fullyQualifiedName;
 	}
 		
-	public BuiltPQuery addParameter(String name, String inputKey) {
+	public TabularPQuery addParameter(String name, String inputKey) {
 		return addParameter(name, inputKey, "String");
 	}
 	
-	public BuiltPQuery addParameter(String name, String inputKey, String typeName) {
+	public TabularPQuery addParameter(String name, String inputKey, String typeName) {
 		PParameter parameter = new PParameter(name, typeName, new StringExactInstancesKey(inputKey), PParameterDirection.INOUT);
 		parameters.put(name,  parameter);
 		return this;
@@ -62,7 +62,7 @@ public class BuiltPQuery extends BasePQuery {
 	}
 	
 	// Type constraint
-	public BuiltPQuery addConstraint(String type, String name) {
+	public TabularPQuery addConstraint(String type, String name) {
 		PBody body = bodies.peek();
 		PVariable var = body.getOrCreateVariableByName(name);
 		new TypeConstraint(body, Tuples.flatTupleOf(var), new StringExactInstancesKey(type));
@@ -70,7 +70,7 @@ public class BuiltPQuery extends BasePQuery {
 	}
 	
 	// Relation constraint
-	public BuiltPQuery addConstraint(String type, String sourceName, String targetName) {
+	public TabularPQuery addConstraint(String type, String sourceName, String targetName) {
 		PBody body = bodies.peek();
 		PVariable var_source = body.getOrCreateVariableByName(sourceName);
 		PVariable var_target = body.getOrCreateVariableByName(targetName);
@@ -79,7 +79,7 @@ public class BuiltPQuery extends BasePQuery {
 	}
 	
 	// Create new Body
-	public BuiltPQuery addBody() {
+	public TabularPQuery addBody() {
 		PBody body = new PBody(this);
 		parameters.forEach((name, parameter) -> {
 			PVariable var = body.getOrCreateVariableByName(name);
@@ -91,7 +91,7 @@ public class BuiltPQuery extends BasePQuery {
 	}
 	
 	// Equality constraint
-	public BuiltPQuery addEquality(String type, String sourceName, String targetName) {
+	public TabularPQuery addEquality(String type, String sourceName, String targetName) {
 		PBody body = bodies.peek();
 		PVariable var_source = body.getOrCreateVariableByName(sourceName);
 		PVariable var_target = body.getOrCreateVariableByName(targetName);
@@ -100,7 +100,7 @@ public class BuiltPQuery extends BasePQuery {
 	}
 	
 	// Inequality constraint
-	public BuiltPQuery addInequality(String type, String sourceName, String targetName) {
+	public TabularPQuery addInequality(String type, String sourceName, String targetName) {
 		PBody body = bodies.peek();
 		PVariable var_source = body.getOrCreateVariableByName(sourceName);
 		PVariable var_target = body.getOrCreateVariableByName(targetName);
@@ -109,7 +109,7 @@ public class BuiltPQuery extends BasePQuery {
 	}
 	
 	// Positive pattern call
-	public BuiltPQuery addPatternCall(PQuery query, String... names) {
+	public TabularPQuery addPatternCall(PQuery query, String... names) {
 		PBody body = bodies.peek();
 		PVariable[] vars = new PVariable[names.length];
 		for (int i = 0; i < names.length; i++) {
@@ -120,7 +120,7 @@ public class BuiltPQuery extends BasePQuery {
 	}
 	
 	// Negative pattern call
-	public BuiltPQuery addNegativePatternCall(PQuery query, String... names) {
+	public TabularPQuery addNegativePatternCall(PQuery query, String... names) {
 		PBody body = bodies.peek();
 		PVariable[] vars = new PVariable[names.length];
 		for (int i = 0; i < names.length; i++) {
@@ -131,7 +131,7 @@ public class BuiltPQuery extends BasePQuery {
 	}
 	
 	// Binary transitive closure pattern call
-	public BuiltPQuery addBinaryTransitiveClosure(PQuery query, String sourceName, String targetName) {
+	public TabularPQuery addBinaryTransitiveClosure(PQuery query, String sourceName, String targetName) {
 		PBody body = bodies.peek();
 		PVariable var_source = body.getOrCreateVariableByName(sourceName);
 		PVariable var_target = body.getOrCreateVariableByName(targetName);
@@ -140,11 +140,11 @@ public class BuiltPQuery extends BasePQuery {
 	}
 	
 	// Binary reflexive transitive closure pattern call
-	public BuiltPQuery addBinaryReflexiveTransitiveClosure(PQuery query, String sourceName, String targetName) {
+	public TabularPQuery addBinaryReflexiveTransitiveClosure(PQuery query, String sourceName, String targetName) {
 		PBody body = bodies.peek();
 		PVariable var_source = body.getOrCreateVariableByName(sourceName);
 		PVariable var_target = body.getOrCreateVariableByName(targetName);
-		new BinaryReflexiveTransitiveClosure(body, Tuples.flatTupleOf(var_source, var_target), query, new StringExactInstancesKey(query.getParameters().get(0).getTypeName()));
+		new BinaryReflexiveTransitiveClosure(body, Tuples.flatTupleOf(var_source, var_target), query, query.getParameters().get(0).getDeclaredUnaryType());
 		return this;
 	}
 	
