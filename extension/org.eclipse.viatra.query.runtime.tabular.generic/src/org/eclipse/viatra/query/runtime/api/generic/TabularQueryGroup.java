@@ -8,13 +8,13 @@ import org.eclipse.viatra.query.runtime.api.impl.BaseQueryGroup;
 
 public class TabularQueryGroup extends BaseQueryGroup {
 
-    protected Set<IQuerySpecification<?>> querySpecifications = new HashSet<IQuerySpecification<?>>();
+	protected Set<IQuerySpecification<?>> querySpecifications = new HashSet<IQuerySpecification<?>>();
 
-    @Override
-    public Set<IQuerySpecification<?>> getSpecifications() {
-        return querySpecifications;
-    }
-	
+	@Override
+	public Set<IQuerySpecification<?>> getSpecifications() {
+		return querySpecifications;
+	}
+
 	public void addQuerySpecification(TabularQuerySpecification querySpecification) {
 		this.querySpecifications.add(querySpecification);
 	}

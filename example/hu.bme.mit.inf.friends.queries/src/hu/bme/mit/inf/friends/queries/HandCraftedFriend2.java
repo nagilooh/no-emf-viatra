@@ -698,7 +698,6 @@ public final class HandCraftedFriend2 extends BaseGeneratedEMFQuerySpecification
 			TabularPQuery query = new TabularPQuery("hu.bme.mit.inf.friends.queries.friend2")
 				.addParameter("p1", "Person")
 				.addParameter("p2", "Person")
-				.addBody()
 				.addConstraint("Person", "p1")
 				.addConstraint("Person", "p2")
 				.addConstraint("Friend", "p1", "p2");

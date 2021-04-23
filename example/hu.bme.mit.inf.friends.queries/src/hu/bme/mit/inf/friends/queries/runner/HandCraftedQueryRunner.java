@@ -3,6 +3,7 @@ package hu.bme.mit.inf.friends.queries.runner;
 import org.eclipse.viatra.query.runtime.api.GenericPatternMatch;
 import org.eclipse.viatra.query.runtime.api.GenericPatternMatcher;
 import org.eclipse.viatra.query.runtime.api.ViatraQueryEngine;
+import org.eclipse.viatra.query.runtime.api.generic.LambdaPQuery;
 import org.eclipse.viatra.query.runtime.api.generic.TabularPQuery;
 import org.eclipse.viatra.query.runtime.api.generic.TabularQuerySpecification;
 import org.eclipse.viatra.query.runtime.api.scope.QueryScope;
@@ -101,10 +102,13 @@ public class HandCraftedQueryRunner {
 		TabularPQuery query = new TabularPQuery("hu.bme.mit.inf.friends.queries.fully_hand_made_friend")
 				.addParameter("p1", "Person")
 				.addParameter("p2", "Person")
-				.addBody()
 				.addConstraint("Person", "p1")
 				.addConstraint("Person", "p2")
-				.addConstraint("Friend", "p1", "p2");
+				.addConstraint("Friend", "p1", "p2")
+				.or()
+				.addConstraint("Person", "p1")
+				.addConstraint("Person", "p2")
+				.addConstraint("Friend", "p2", "p1");
 //		query = new TabularPQuery("hu.bme.mit.inf.friends.queries.fully_hand_made_friend2")
 //				.addParameter("p1", "Person")
 //				.addParameter("p2", "Person")
@@ -113,6 +117,23 @@ public class HandCraftedQueryRunner {
 		TabularQuerySpecification querySpecification = new TabularQuerySpecification(query);
 		GenericPatternMatcher matcher_test = querySpecification.getMatcher(engine);
 		for (GenericPatternMatch match : matcher_test.getAllMatches()) {
+			System.out.println(match.toString());
+		}
+
+		System.out.println("Lambda friend:");
+		LambdaPQuery lambdaQuery = new LambdaPQuery("lambda_friend");
+		lambdaQuery.pattern((p1, p2) -> lambdaQuery
+						.constraint("Person", p1)
+						.constraint("Person", p2)
+						.constraint("Friend", p1, p2)
+						.or()
+						.constraint("Person", p1)
+						.constraint("Person", p2)
+						.constraint("Friend", p2, p1));
+		
+		TabularQuerySpecification lambdaQuerySpecification = new TabularQuerySpecification(lambdaQuery);
+		GenericPatternMatcher matcher_lambda = lambdaQuerySpecification.getMatcher(engine);
+		for (GenericPatternMatch match : matcher_lambda.getAllMatches()) {
 			System.out.println(match.toString());
 		}
 	}

@@ -1,15 +1,14 @@
 package org.eclipse.viatra.query.runtime.api.generic;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
 import org.eclipse.viatra.query.runtime.matchers.backend.QueryEvaluationHint;
+import org.eclipse.viatra.query.runtime.matchers.context.IInputKey;
 import org.eclipse.viatra.query.runtime.matchers.psystem.PBody;
 import org.eclipse.viatra.query.runtime.matchers.psystem.PVariable;
 import org.eclipse.viatra.query.runtime.matchers.psystem.basicdeferred.Equality;
@@ -29,18 +28,31 @@ import org.eclipse.viatra.query.runtime.matchers.tuple.Tuples;
 import org.eclipse.viatra.query.runtime.tabular.generic.types.StringExactInstancesKey;
 import org.eclipse.viatra.query.runtime.tabular.generic.types.StringStructuralFeatureInstancesKey;
 
-public class TabularPQuery extends BasePQuery {
+public class LambdaPQuery extends BasePQuery {
 
-	private final Map<String, PParameter> parameters = new HashMap<String, PParameter>();
+	public interface PatternOneParam {
+		PQuery build(String parameter);
+	}
+
+	public interface PatternTwoParams {
+		PQuery build(String parameter1, String parameter2);
+	}
+
+	public interface PatternThreeParams {
+		PQuery build(String parameter1, String parameter2, String parameter3);
+	}
+
+	public interface PatternFourParams {
+		PQuery build(String parameter1, String parameter2, String parameter3, String parameter4);
+	}
+
+	private List<PParameter> embeddedParameters = null;
 	private String fullyQualifiedName;
 	private LinkedList<PBody> bodies = new LinkedList<PBody>();
-	private List<ExportedParameter> symbolicParameters;
 
-	public TabularPQuery(String fullyQualifiedName) {
+	public LambdaPQuery(String fullyQualifiedName) {
 		super(PVisibility.PUBLIC);
 		this.fullyQualifiedName = fullyQualifiedName;
-		PBody body = new PBody(this);
-		bodies.add(body);
 	}
 
 	@Override
@@ -48,33 +60,79 @@ public class TabularPQuery extends BasePQuery {
 		return fullyQualifiedName;
 	}
 
-	public TabularPQuery addParameter(String name, String inputKey) {
-		return addParameter(name, inputKey, "String");
-	}
+	public LambdaPQuery pattern(PatternOneParam p) {
+		PParameter parameter1 = new PParameter("p1", "String", (IInputKey) null, PParameterDirection.INOUT);
+		embeddedParameters = Arrays.asList(parameter1);
+		bodies.add(new PBody(this));
+		p.build("var_1");
 
-	public TabularPQuery addParameter(String name, String inputKey, String typeName) {
-		PParameter parameter = new PParameter(name, typeName, new StringExactInstancesKey(inputKey),
-				PParameterDirection.INOUT);
-		parameters.put(name, parameter);
-		
-		PBody body = bodies.peekLast();
-		List<ExportedParameter> symbolicParameters = new ArrayList<>();
-		parameters.forEach((pName, pParameter) -> {
-			PVariable var = body.getOrCreateVariableByName(pName);
-			symbolicParameters.add(new ExportedParameter(body, var, pParameter));
-		});
-		body.setSymbolicParameters(symbolicParameters);
-		
+		for (PBody body : bodies) {
+			body.setSymbolicParameters(Arrays.<ExportedParameter>asList(
+					new ExportedParameter(body, body.getOrCreateVariableByName("var_1"), parameter1)));
+		}
 		return this;
 	}
 
-	@Override
-	public List<PParameter> getParameters() {
-		return new ArrayList<PParameter>(parameters.values());
+	public LambdaPQuery pattern(PatternTwoParams p) {
+		PParameter parameter1 = new PParameter("p1", "String", (IInputKey) null, PParameterDirection.INOUT);
+		PParameter parameter2 = new PParameter("p2", "String", (IInputKey) null, PParameterDirection.INOUT);
+		embeddedParameters = Arrays.asList(parameter1, parameter2);
+		bodies.add(new PBody(this));
+		p.build("var_1", "var_2");
+
+		for (PBody body : bodies) {
+			body.setSymbolicParameters(Arrays.<ExportedParameter>asList(
+					new ExportedParameter(body, body.getOrCreateVariableByName("var_1"), parameter1),
+					new ExportedParameter(body, body.getOrCreateVariableByName("var_2"), parameter2)));
+		}
+		return this;
+	}
+
+	public LambdaPQuery pattern(PatternThreeParams p) {
+		PParameter parameter1 = new PParameter("p1", "String", (IInputKey) null, PParameterDirection.INOUT);
+		PParameter parameter2 = new PParameter("p2", "String", (IInputKey) null, PParameterDirection.INOUT);
+		PParameter parameter3 = new PParameter("p3", "String", (IInputKey) null, PParameterDirection.INOUT);
+		embeddedParameters = Arrays.asList(parameter1, parameter2, parameter3);
+		bodies.add(new PBody(this));
+		p.build("var_1", "var_2", "var_3");
+
+		for (PBody body : bodies) {
+			body.setSymbolicParameters(Arrays.<ExportedParameter>asList(
+					new ExportedParameter(body, body.getOrCreateVariableByName("var_1"), parameter1),
+					new ExportedParameter(body, body.getOrCreateVariableByName("var_2"), parameter2),
+					new ExportedParameter(body, body.getOrCreateVariableByName("var_3"), parameter3)));
+		}
+		return this;
+	}
+
+	public LambdaPQuery pattern(PatternFourParams p) {
+		PParameter parameter1 = new PParameter("p1", "String", (IInputKey) null, PParameterDirection.INOUT);
+		PParameter parameter2 = new PParameter("p2", "String", (IInputKey) null, PParameterDirection.INOUT);
+		PParameter parameter3 = new PParameter("p3", "String", (IInputKey) null, PParameterDirection.INOUT);
+		PParameter parameter4 = new PParameter("p4", "String", (IInputKey) null, PParameterDirection.INOUT);
+		embeddedParameters = Arrays.asList(parameter1, parameter2, parameter3, parameter4);
+		bodies.add(new PBody(this));
+		p.build("var_1", "var_2", "var_3", "var_4");
+
+		for (PBody body : bodies) {
+			body.setSymbolicParameters(Arrays.<ExportedParameter>asList(
+					new ExportedParameter(body, body.getOrCreateVariableByName("var_1"), parameter1),
+					new ExportedParameter(body, body.getOrCreateVariableByName("var_2"), parameter2),
+					new ExportedParameter(body, body.getOrCreateVariableByName("var_3"), parameter3),
+					new ExportedParameter(body, body.getOrCreateVariableByName("var_4"), parameter4)));
+		}
+		return this;
+	}
+
+	// Create new Body
+	public LambdaPQuery or() {
+		PBody body = new PBody(this);
+		bodies.add(body);
+		return this;
 	}
 
 	// Type constraint
-	public TabularPQuery addConstraint(String type, String name) {
+	public LambdaPQuery constraint(String type, String name) {
 		PBody body = bodies.peekLast();
 		PVariable var = body.getOrCreateVariableByName(name);
 		new TypeConstraint(body, Tuples.flatTupleOf(var), new StringExactInstancesKey(type));
@@ -82,7 +140,7 @@ public class TabularPQuery extends BasePQuery {
 	}
 
 	// Relation constraint
-	public TabularPQuery addConstraint(String type, String sourceName, String targetName) {
+	public LambdaPQuery constraint(String type, String sourceName, String targetName) {
 		PBody body = bodies.peekLast();
 		PVariable var_source = body.getOrCreateVariableByName(sourceName);
 		PVariable var_target = body.getOrCreateVariableByName(targetName);
@@ -91,21 +149,8 @@ public class TabularPQuery extends BasePQuery {
 		return this;
 	}
 
-	// Create new Body
-	public TabularPQuery or() {
-		PBody body = new PBody(this);
-		List<ExportedParameter> symbolicParameters = new ArrayList<>();
-		parameters.forEach((name, parameter) -> {
-			PVariable var = body.getOrCreateVariableByName(name);
-			symbolicParameters.add(new ExportedParameter(body, var, parameter));
-		});
-		body.setSymbolicParameters(symbolicParameters);
-		bodies.add(body);
-		return this;
-	}
-
 	// Equality constraint
-	public TabularPQuery addEquality(String sourceName, String targetName) {
+	public LambdaPQuery equality(String sourceName, String targetName) {
 		PBody body = bodies.peekLast();
 		PVariable var_source = body.getOrCreateVariableByName(sourceName);
 		PVariable var_target = body.getOrCreateVariableByName(targetName);
@@ -114,7 +159,7 @@ public class TabularPQuery extends BasePQuery {
 	}
 
 	// Inequality constraint
-	public TabularPQuery addInequality(String sourceName, String targetName) {
+	public LambdaPQuery inequality(String sourceName, String targetName) {
 		PBody body = bodies.peekLast();
 		PVariable var_source = body.getOrCreateVariableByName(sourceName);
 		PVariable var_target = body.getOrCreateVariableByName(targetName);
@@ -123,7 +168,7 @@ public class TabularPQuery extends BasePQuery {
 	}
 
 	// Positive pattern call
-	public TabularPQuery addPatternCall(PQuery query, String... names) {
+	public LambdaPQuery patternCall(PQuery query, String... names) {
 		PBody body = bodies.peekLast();
 		PVariable[] vars = new PVariable[names.length];
 		for (int i = 0; i < names.length; i++) {
@@ -134,7 +179,7 @@ public class TabularPQuery extends BasePQuery {
 	}
 
 	// Negative pattern call
-	public TabularPQuery addNegativePatternCall(PQuery query, String... names) {
+	public LambdaPQuery negativePatternCall(PQuery query, String... names) {
 		PBody body = bodies.peekLast();
 		PVariable[] vars = new PVariable[names.length];
 		for (int i = 0; i < names.length; i++) {
@@ -145,7 +190,7 @@ public class TabularPQuery extends BasePQuery {
 	}
 
 	// Binary transitive closure pattern call
-	public TabularPQuery addBinaryTransitiveClosure(PQuery query, String sourceName, String targetName) {
+	public LambdaPQuery binaryTransitiveClosure(PQuery query, String sourceName, String targetName) {
 		PBody body = bodies.peekLast();
 		PVariable var_source = body.getOrCreateVariableByName(sourceName);
 		PVariable var_target = body.getOrCreateVariableByName(targetName);
@@ -154,7 +199,7 @@ public class TabularPQuery extends BasePQuery {
 	}
 
 	// Binary reflexive transitive closure pattern call
-	public TabularPQuery addBinaryReflexiveTransitiveClosure(PQuery query, String sourceName, String targetName) {
+	public LambdaPQuery binaryReflexiveTransitiveClosure(PQuery query, String sourceName, String targetName) {
 		PBody body = bodies.peekLast();
 		PVariable var_source = body.getOrCreateVariableByName(sourceName);
 		PVariable var_target = body.getOrCreateVariableByName(targetName);
@@ -164,17 +209,14 @@ public class TabularPQuery extends BasePQuery {
 	}
 
 	@Override
+	public List<PParameter> getParameters() {
+		return embeddedParameters;
+	}
+
+	@Override
 	public Set<PBody> doGetContainedBodies() {
 		setEvaluationHints(new QueryEvaluationHint(null, QueryEvaluationHint.BackendRequirement.UNSPECIFIED));
 		return new LinkedHashSet<PBody>(bodies);
-	}
-
-	public void addSymbolicParameters(ExportedParameter symbolicParameter) {
-		checkMutability();
-		if (symbolicParameters == null) {
-			symbolicParameters = new ArrayList<>();
-		}
-		symbolicParameters.add(symbolicParameter);
 	}
 
 }
