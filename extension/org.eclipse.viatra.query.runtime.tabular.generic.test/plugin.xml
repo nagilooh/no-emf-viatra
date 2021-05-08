@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><plugin>
+  <extension id="org.eclipse.viatra.query.runtime.tabular.generic.test.queries.Test_queries" point="org.eclipse.viatra.query.runtime.queryspecification">
+    <group group="org.eclipse.viatra.query.runtime.extensibility.SingletonExtensionFactory:org.eclipse.viatra.query.runtime.tabular.generic.test.queries.Test_queries" id="org.eclipse.viatra.query.runtime.tabular.generic.test.queries.Test_queries">
+      <query-specification fqn="org.eclipse.viatra.query.runtime.tabular.generic.test.queries.typeConstraintTest"/>
+      <query-specification fqn="org.eclipse.viatra.query.runtime.tabular.generic.test.queries.relationConstraintTest"/>
+      <query-specification fqn="org.eclipse.viatra.query.runtime.tabular.generic.test.queries.findTest"/>
+      <query-specification fqn="org.eclipse.viatra.query.runtime.tabular.generic.test.queries.negFindTest"/>
+      <query-specification fqn="org.eclipse.viatra.query.runtime.tabular.generic.test.queries.equalityTest"/>
+      <query-specification fqn="org.eclipse.viatra.query.runtime.tabular.generic.test.queries.inequalityTest"/>
+      <query-specification fqn="org.eclipse.viatra.query.runtime.tabular.generic.test.queries.binaryTransitiveClosureTest"/>
+      <query-specification fqn="org.eclipse.viatra.query.runtime.tabular.generic.test.queries.binaryReflexiveTransitiveClosureTest"/>
+    </group>
+  </extension>
+  <extension id="queryrunner" point="org.eclipse.core.runtime.applications">
+    <application cardinality="singleton-global" thread="main" visible="true">
+      <run class="org.eclipse.viatra.query.runtime.tabular.generic.test.QueryRunner"/>
+    </application>
+  </extension>
+</plugin>

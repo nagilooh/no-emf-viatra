@@ -1,0 +1,37 @@
+package org.eclipse.viatra.query.runtime.tabular.generic.test.queries
+
+import "http://www.inf.mit.bme.hu/friends"
+
+pattern typeConstraintTest(p1) {
+	Person(p1);
+}
+
+pattern relationConstraintTest(p1 : Person, p2 : Person) {
+	Person.friend(p1, p2);
+}
+
+pattern findTest(p1 : Person, p2 : Person) {
+	find relationConstraintTest(p1, p2);
+}
+
+pattern negFindTest(p1 : Person) {
+	neg find relationConstraintTest(p1, _);
+}
+
+pattern equalityTest(p1 : Person, p2 : Person) {
+	p1 == p2;
+}
+
+pattern inequalityTest(p1 : Person, p2 : Person) {
+	find relationConstraintTest(p1, p3);
+	find relationConstraintTest(p2, p3);
+	p1 != p2;
+}
+
+pattern binaryTransitiveClosureTest(p1 : Person, p2 : Person) {
+	find relationConstraintTest+(p1, p2);
+}
+
+pattern binaryReflexiveTransitiveClosureTest(p1 : Person, p2 : Person) {
+	find relationConstraintTest*(p1, p2);
+}
