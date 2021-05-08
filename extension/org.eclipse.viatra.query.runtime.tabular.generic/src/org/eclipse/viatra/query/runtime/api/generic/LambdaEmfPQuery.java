@@ -1,14 +1,17 @@
 package org.eclipse.viatra.query.runtime.api.generic;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.viatra.query.runtime.api.impl.BaseGeneratedEMFPQuery;
+import org.eclipse.emf.ecore.EClassifier;
+import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.viatra.query.runtime.emf.types.EClassTransitiveInstancesKey;
 import org.eclipse.viatra.query.runtime.emf.types.EStructuralFeatureInstancesKey;
 import org.eclipse.viatra.query.runtime.matchers.backend.QueryEvaluationHint;
@@ -23,13 +26,15 @@ import org.eclipse.viatra.query.runtime.matchers.psystem.basicenumerables.Binary
 import org.eclipse.viatra.query.runtime.matchers.psystem.basicenumerables.BinaryTransitiveClosure;
 import org.eclipse.viatra.query.runtime.matchers.psystem.basicenumerables.PositivePatternCall;
 import org.eclipse.viatra.query.runtime.matchers.psystem.basicenumerables.TypeConstraint;
+import org.eclipse.viatra.query.runtime.matchers.psystem.queries.BasePQuery;
 import org.eclipse.viatra.query.runtime.matchers.psystem.queries.PParameter;
 import org.eclipse.viatra.query.runtime.matchers.psystem.queries.PParameterDirection;
 import org.eclipse.viatra.query.runtime.matchers.psystem.queries.PQuery;
 import org.eclipse.viatra.query.runtime.matchers.psystem.queries.PVisibility;
+import org.eclipse.viatra.query.runtime.matchers.psystem.queries.QueryInitializationException;
 import org.eclipse.viatra.query.runtime.matchers.tuple.Tuples;
 
-public class LambdaEmfPQuery extends BaseGeneratedEMFPQuery {
+public class LambdaEmfPQuery extends BasePQuery {
 
 	public interface PatternOneParam {
 		PQuery build(String parameter);
@@ -48,12 +53,19 @@ public class LambdaEmfPQuery extends BaseGeneratedEMFPQuery {
 	}
 
 	private List<PParameter> embeddedParameters = null;
+	private String[] exportedParameterNames = null;
 	private String fullyQualifiedName;
-	private LinkedList<PBody> bodies = new LinkedList<PBody>();
+	protected LinkedList<PBody> bodies;
+	private Map<String, String[]> variables;
+	private GenericPBodyNormalizer normalizer;
 
 	public LambdaEmfPQuery(String fullyQualifiedName) {
 		super(PVisibility.PUBLIC);
 		this.fullyQualifiedName = fullyQualifiedName;
+		embeddedParameters = new ArrayList<>();
+		bodies = new LinkedList<PBody>();
+		variables = new HashMap<String, String[]>();
+		normalizer = new GenericPBodyNormalizer();
 	}
 
 	@Override
@@ -61,67 +73,102 @@ public class LambdaEmfPQuery extends BaseGeneratedEMFPQuery {
 		return fullyQualifiedName;
 	}
 
-	public LambdaEmfPQuery pattern(PatternOneParam p) {
-		PParameter parameter1 = new PParameter("p1", "String", (IInputKey) null, PParameterDirection.INOUT);
-		embeddedParameters = Arrays.asList(parameter1);
+	public PQuery pattern(PatternOneParam p) {
+		String[] valirableNames = {"p1"};
 		bodies.add(new PBody(this));
-		p.build("var_1");
-
-		for (PBody body : bodies) {
-			body.setSymbolicParameters(Arrays.<ExportedParameter>asList(
-					new ExportedParameter(body, body.getOrCreateVariableByName("var_1"), parameter1)));
+		p.build(valirableNames[0]);
+		
+		if (exportedParameterNames == null) {
+			exportedParameterNames = valirableNames;
 		}
-		return this;
+		
+		for (PBody body : bodies) {
+			ArrayList<ExportedParameter> exportedParameters = new ArrayList<ExportedParameter>();
+			for (String exportedParameterName : exportedParameterNames) {
+				String[] identifier = variables.get(exportedParameterName);
+				IInputKey declaredUnaryType = new EClassTransitiveInstancesKey((EClass)getClassifierLiteralSafe(identifier[1], identifier[2]));
+				PParameter parameter = new PParameter(exportedParameterName, identifier[0], declaredUnaryType, PParameterDirection.INOUT);
+				embeddedParameters.add(parameter);
+				exportedParameters.add(new ExportedParameter(body, body.getOrCreateVariableByName(exportedParameterName), parameter));
+			}
+			body.setSymbolicParameters(exportedParameters);
+		}
+		return normalizer.rewrite(this).getQuery();
 	}
 
-	public LambdaEmfPQuery pattern(PatternTwoParams p) {
-		PParameter parameter1 = new PParameter("p1", "String", (IInputKey) null, PParameterDirection.INOUT);
-		PParameter parameter2 = new PParameter("p2", "String", (IInputKey) null, PParameterDirection.INOUT);
-		embeddedParameters = Arrays.asList(parameter1, parameter2);
+	public PQuery pattern(PatternTwoParams p) {
+		String[] valirableNames = {"p1", "p2"};
 		bodies.add(new PBody(this));
-		p.build("var_1", "var_2");
-
-		for (PBody body : bodies) {
-			body.setSymbolicParameters(Arrays.<ExportedParameter>asList(
-					new ExportedParameter(body, body.getOrCreateVariableByName("var_1"), parameter1),
-					new ExportedParameter(body, body.getOrCreateVariableByName("var_2"), parameter2)));
+		p.build(valirableNames[0], valirableNames[1]);
+		
+		if (exportedParameterNames == null) {
+			exportedParameterNames = valirableNames;
 		}
-		return this;
+		
+		for (PBody body : bodies) {
+			ArrayList<ExportedParameter> exportedParameters = new ArrayList<ExportedParameter>();
+			for (String exportedParameterName : exportedParameterNames) {
+				String[] identifier = variables.get(exportedParameterName);
+				IInputKey declaredUnaryType = new EClassTransitiveInstancesKey((EClass)getClassifierLiteralSafe(identifier[1], identifier[2]));
+				PParameter parameter = new PParameter(exportedParameterName, identifier[0], declaredUnaryType, PParameterDirection.INOUT);
+				embeddedParameters.add(parameter);
+				exportedParameters.add(new ExportedParameter(body, body.getOrCreateVariableByName(exportedParameterName), parameter));
+			}
+			body.setSymbolicParameters(exportedParameters);
+		}
+		return normalizer.rewrite(this).getQuery();
 	}
 
-	public LambdaEmfPQuery pattern(PatternThreeParams p) {
-		PParameter parameter1 = new PParameter("p1", "String", (IInputKey) null, PParameterDirection.INOUT);
-		PParameter parameter2 = new PParameter("p2", "String", (IInputKey) null, PParameterDirection.INOUT);
-		PParameter parameter3 = new PParameter("p3", "String", (IInputKey) null, PParameterDirection.INOUT);
-		embeddedParameters = Arrays.asList(parameter1, parameter2, parameter3);
+	public PQuery pattern(PatternThreeParams p) {
+		String[] valirableNames = {"p1", "p2", "p3"};
 		bodies.add(new PBody(this));
-		p.build("var_1", "var_2", "var_3");
-
-		for (PBody body : bodies) {
-			body.setSymbolicParameters(Arrays.<ExportedParameter>asList(
-					new ExportedParameter(body, body.getOrCreateVariableByName("var_1"), parameter1),
-					new ExportedParameter(body, body.getOrCreateVariableByName("var_2"), parameter2),
-					new ExportedParameter(body, body.getOrCreateVariableByName("var_3"), parameter3)));
+		p.build(valirableNames[0], valirableNames[1], valirableNames[2]);
+		
+		if (exportedParameterNames == null) {
+			exportedParameterNames = valirableNames;
 		}
-		return this;
+		
+		for (PBody body : bodies) {
+			ArrayList<ExportedParameter> exportedParameters = new ArrayList<ExportedParameter>();
+			for (String exportedParameterName : exportedParameterNames) {
+				String[] identifier = variables.get(exportedParameterName);
+				IInputKey declaredUnaryType = new EClassTransitiveInstancesKey((EClass)getClassifierLiteralSafe(identifier[1], identifier[2]));
+				PParameter parameter = new PParameter(exportedParameterName, identifier[0], declaredUnaryType, PParameterDirection.INOUT);
+				embeddedParameters.add(parameter);
+				exportedParameters.add(new ExportedParameter(body, body.getOrCreateVariableByName(exportedParameterName), parameter));
+			}
+			body.setSymbolicParameters(exportedParameters);
+		}
+		return normalizer.rewrite(this).getQuery();
 	}
 
-	public LambdaEmfPQuery pattern(PatternFourParams p) {
-		PParameter parameter1 = new PParameter("p1", "String", (IInputKey) null, PParameterDirection.INOUT);
-		PParameter parameter2 = new PParameter("p2", "String", (IInputKey) null, PParameterDirection.INOUT);
-		PParameter parameter3 = new PParameter("p3", "String", (IInputKey) null, PParameterDirection.INOUT);
-		PParameter parameter4 = new PParameter("p4", "String", (IInputKey) null, PParameterDirection.INOUT);
-		embeddedParameters = Arrays.asList(parameter1, parameter2, parameter3, parameter4);
+	public PQuery pattern(PatternFourParams p) {
+		String[] valirableNames = {"p1", "p2", "p3", "p4"};
 		bodies.add(new PBody(this));
-		p.build("var_1", "var_2", "var_3", "var_4");
-
-		for (PBody body : bodies) {
-			body.setSymbolicParameters(Arrays.<ExportedParameter>asList(
-					new ExportedParameter(body, body.getOrCreateVariableByName("var_1"), parameter1),
-					new ExportedParameter(body, body.getOrCreateVariableByName("var_2"), parameter2),
-					new ExportedParameter(body, body.getOrCreateVariableByName("var_3"), parameter3),
-					new ExportedParameter(body, body.getOrCreateVariableByName("var_4"), parameter4)));
+		p.build(valirableNames[0], valirableNames[1], valirableNames[2], valirableNames[3]);
+		
+		if (exportedParameterNames == null) {
+			exportedParameterNames = valirableNames;
 		}
+		
+		for (PBody body : bodies) {
+			ArrayList<ExportedParameter> exportedParameters = new ArrayList<ExportedParameter>();
+			for (String exportedParameterName : exportedParameterNames) {
+				String[] identifier = variables.get(exportedParameterName);
+				IInputKey declaredUnaryType = new EClassTransitiveInstancesKey((EClass)getClassifierLiteralSafe(identifier[1], identifier[2]));
+				PParameter parameter = new PParameter(exportedParameterName, identifier[0], declaredUnaryType, PParameterDirection.INOUT);
+				embeddedParameters.add(parameter);
+				exportedParameters.add(new ExportedParameter(body, body.getOrCreateVariableByName(exportedParameterName), parameter));
+			}
+			body.setSymbolicParameters(exportedParameters);
+		}
+		return normalizer.rewrite(this).getQuery();
+	}
+	
+	// Chooses which variables are exported as parameters
+	// If not called, all variables are treated as parameters
+	public LambdaEmfPQuery exportParameters(String... names) {
+		exportedParameterNames = names;
 		return this;
 	}
 
@@ -133,16 +180,17 @@ public class LambdaEmfPQuery extends BaseGeneratedEMFPQuery {
 	}
 
 	// Type constraint
-	public LambdaEmfPQuery constraint(String packageUri, String classifierName, String name) {
+	public LambdaEmfPQuery constraint(String typeName, String packageUri, String classifierName, String name) {
 		PBody body = bodies.peekLast();
 		PVariable var = body.getOrCreateVariableByName(name);
+		variables.put(name, new String[] {typeName, packageUri, classifierName});
 		new TypeConstraint(body, Tuples.flatTupleOf(var),
 				new EClassTransitiveInstancesKey((EClass) getClassifierLiteral(packageUri, classifierName)));
 		return this;
 	}
 
 	// Relation constraint
-	public LambdaEmfPQuery constraint(String packageUri, String className, String featureName, String sourceName,
+	public LambdaEmfPQuery constraint(String typeName, String packageUri, String className, String featureName, String sourceName,
 			String targetName) {
 		PBody body = bodies.peekLast();
 		PVariable var_source = body.getOrCreateVariableByName(sourceName);
@@ -210,7 +258,7 @@ public class LambdaEmfPQuery extends BaseGeneratedEMFPQuery {
 				query.getParameters().get(0).getDeclaredUnaryType());
 		return this;
 	}
-
+	
 	@Override
 	public List<PParameter> getParameters() {
 		return embeddedParameters;
@@ -221,5 +269,50 @@ public class LambdaEmfPQuery extends BaseGeneratedEMFPQuery {
 		setEvaluationHints(new QueryEvaluationHint(null, QueryEvaluationHint.BackendRequirement.UNSPECIFIED));
 		return new LinkedHashSet<PBody>(bodies);
 	}
+	
+    /**
+     * For parameter type retrieval only.
+     * 
+     * <p>If parameter type declaration is erroneous, we still get a working parameter list (without the type declaration); 
+     *  the exception will be thrown again later when the body is processed.
+     */
+    protected EClassifier getClassifierLiteralSafe(String packageURI, String classifierName) {
+        try {
+            return getClassifierLiteral(packageURI, classifierName);
+        } catch (QueryInitializationException e) {
+            return null;
+        }
+    }
+	
+    protected EClassifier getClassifierLiteral(String packageUri, String classifierName) {
+        EPackage ePackage = EPackage.Registry.INSTANCE.getEPackage(packageUri);
+        if (ePackage == null) 
+            throw new QueryInitializationException(
+                    "Query refers to EPackage {1} not found in EPackage Registry.", 
+                    new String[]{packageUri}, 
+                    "Query refers to missing EPackage.", this);
+        EClassifier literal = ePackage.getEClassifier(classifierName);
+        if (literal == null) 
+            throw new QueryInitializationException(
+                    "Query refers to classifier {1} not found in EPackage {2}.", 
+                    new String[]{classifierName, packageUri}, 
+                    "Query refers to missing type in EPackage.", this);
+        return literal;
+    }
 
+    protected EStructuralFeature getFeatureLiteral(String packageUri, String className, String featureName) {
+        EClassifier container = getClassifierLiteral(packageUri, className);
+        if (! (container instanceof EClass)) 
+            throw new QueryInitializationException(
+                    "Query refers to EClass {1} in EPackage {2} which turned out not be an EClass.", 
+                    new String[]{className, packageUri}, 
+                    "Query refers to missing EClass.", this);
+        EStructuralFeature feature = ((EClass)container).getEStructuralFeature(featureName);
+        if (feature == null) 
+            throw new QueryInitializationException(
+                    "Query refers to feature {1} not found in EClass {2}.", 
+                    new String[]{featureName, className}, 
+                    "Query refers to missing feature.", this);
+        return feature;
+    }
 }

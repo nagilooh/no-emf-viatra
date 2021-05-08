@@ -10,6 +10,7 @@ import java.util.Set;
 import org.eclipse.viatra.query.runtime.matchers.context.AbstractQueryMetaContext;
 import org.eclipse.viatra.query.runtime.matchers.context.IInputKey;
 import org.eclipse.viatra.query.runtime.matchers.context.InputKeyImplication;
+import org.eclipse.viatra.query.runtime.matchers.context.common.JavaTransitiveInstancesKey;
 import org.eclipse.viatra.query.runtime.tabular.generic.types.BaseGenericTypeKey;
 import org.eclipse.viatra.query.runtime.tabular.generic.types.StringStructuralFeatureInstancesKey;
 
@@ -47,7 +48,7 @@ public final class GenericQueryMetaContext extends AbstractQueryMetaContext {
     }
 
     public void ensureValidKey(IInputKey key) {
-        if (! (key instanceof BaseGenericTypeKey<?>))
+        if (!(key instanceof BaseGenericTypeKey<?>) && !(key instanceof JavaTransitiveInstancesKey))
             illegalInputKey(key);
     }
 
