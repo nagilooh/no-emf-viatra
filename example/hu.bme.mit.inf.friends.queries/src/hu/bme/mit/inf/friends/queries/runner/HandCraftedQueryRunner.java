@@ -3,14 +3,17 @@ package hu.bme.mit.inf.friends.queries.runner;
 import org.eclipse.viatra.query.runtime.api.GenericPatternMatch;
 import org.eclipse.viatra.query.runtime.api.GenericPatternMatcher;
 import org.eclipse.viatra.query.runtime.api.ViatraQueryEngine;
-import org.eclipse.viatra.query.runtime.api.generic.LambdaPQuery;
+import org.eclipse.viatra.query.runtime.api.generic.LambdaStringPQuery;
 import org.eclipse.viatra.query.runtime.api.generic.TabularPQuery;
 import org.eclipse.viatra.query.runtime.api.generic.TabularQuerySpecification;
 import org.eclipse.viatra.query.runtime.api.scope.QueryScope;
+import org.eclipse.viatra.query.runtime.matchers.psystem.queries.PQuery;
+import org.eclipse.viatra.query.runtime.matchers.psystem.rewriters.PBodyNormalizer;
 import org.eclipse.viatra.query.runtime.matchers.scopes.SimpleLocalStorageBackend;
 import org.eclipse.viatra.query.runtime.tabular.TabularIndexHost.TabularIndexScope;
 import org.eclipse.viatra.query.runtime.tabular.generic.GenricIndexHost;
 
+import hu.bme.mit.inf.friends.queries.HandCraftedCounterPattern;
 import hu.bme.mit.inf.friends.queries.HandCraftedFriend;
 import hu.bme.mit.inf.friends.queries.HandCraftedFriend2;
 import hu.bme.mit.inf.friends.queries.HandCraftedFriendCircle;
@@ -22,8 +25,8 @@ public class HandCraftedQueryRunner {
 		QueryScope scope = initializeStringifiedScope();
 		ViatraQueryEngine viatraQueryEngine = prepareQueryEngine(scope);
 		printAllMatches(viatraQueryEngine);
-		modifyModel();
-		printAllMatches(viatraQueryEngine);
+//		modifyModel();
+//		printAllMatches(viatraQueryEngine);
 	}
 	
 	private static TabularIndexScope initializeStringifiedScope() {
@@ -36,7 +39,7 @@ public class HandCraftedQueryRunner {
 		// Initialize table for Friend references
 		stringifiedndexHost.initFeatures("Friend");
 
-		String[] people = {"0", "1", "2", "3", "4"};
+		String[] people = {"Jani", "Feri", "Tomi", "Karcsi", "Peti"};
 		for (String person : people) {
 			stringifiedndexHost.addInstance("Person", person);
 		}
@@ -53,9 +56,9 @@ public class HandCraftedQueryRunner {
 	
 	private static void modifyModel() {
 		stringifiedndexHost.addInstance("Person", "Pali");
-		stringifiedndexHost.removeInstance("Person", "2");
-		stringifiedndexHost.addFeature("Friend", "0", "Pali");
-		stringifiedndexHost.addFeature("Friend", "Pali", "4");
+		stringifiedndexHost.removeInstance("Person", "Tomi");
+		stringifiedndexHost.addFeature("Friend", "Jani", "Pali");
+		stringifiedndexHost.addFeature("Friend", "Pali", "Peti");
 		
 		
 	}
@@ -121,8 +124,10 @@ public class HandCraftedQueryRunner {
 		}
 
 		System.out.println("Lambda friend:");
-		LambdaPQuery lambdaQuery = new LambdaPQuery("lambda_friend");
+		PBodyNormalizer normalize = new PBodyNormalizer(stringifiedndexHost.getRuntimeContext().getMetaContext());
+		LambdaStringPQuery lambdaQuery = new LambdaStringPQuery("lambda_friend");
 		lambdaQuery.pattern((p1, p2) -> lambdaQuery
+						.exportParameters(p1)
 						.constraint("Person", p1)
 						.constraint("Person", p2)
 						.constraint("Friend", p1, p2)
@@ -130,8 +135,10 @@ public class HandCraftedQueryRunner {
 						.constraint("Person", p1)
 						.constraint("Person", p2)
 						.constraint("Friend", p2, p1));
+
+		PQuery lambdaQuery2 = normalize.rewrite(lambdaQuery).getQuery();
 		
-		TabularQuerySpecification lambdaQuerySpecification = new TabularQuerySpecification(lambdaQuery);
+		TabularQuerySpecification lambdaQuerySpecification = new TabularQuerySpecification(lambdaQuery2);
 		GenericPatternMatcher matcher_lambda = lambdaQuerySpecification.getMatcher(engine);
 		for (GenericPatternMatch match : matcher_lambda.getAllMatches()) {
 			System.out.println(match.toString());
